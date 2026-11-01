@@ -1,0 +1,6 @@
+{
+  "name": "Sababa English - מודול אנגלית לכיתות ד׳-ה׳",
+  "description": "Interactive English learning platform tailored for Israeli 4th & 5th graders, bridging Hebrew-English phonetic and grammar gaps (P/F distinction, 'to be' verbs, Ministry of Education Band I).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

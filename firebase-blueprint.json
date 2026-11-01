@@ -1,0 +1,139 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Private student profile, learning progress, and personal daily goals.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "Firebase Auth user ID"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 128,
+          "description": "User email address"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 80,
+          "description": "Student display name"
+        },
+        "photoURL": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Avatar photo URL"
+        },
+        "classCode": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Assigned class code (e.g. GRADE4-1)"
+        },
+        "xp": {
+          "type": "number",
+          "description": "Accumulated total XP points"
+        },
+        "streak": {
+          "type": "number",
+          "description": "Consecutive days practice streak"
+        },
+        "dailyExercisesDone": {
+          "type": "number",
+          "description": "Count of exercises completed today"
+        },
+        "dailyGoal": {
+          "type": "number",
+          "description": "Daily exercise target count"
+        },
+        "lastExerciseDate": {
+          "type": "string",
+          "maxLength": 20,
+          "description": "Date string of last completed exercise (YYYY-MM-DD)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Account registration timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last profile update timestamp"
+        }
+      },
+      "required": [
+        "uid",
+        "displayName",
+        "classCode",
+        "xp",
+        "streak",
+        "dailyExercisesDone",
+        "dailyGoal"
+      ]
+    },
+    "ClassroomStudent": {
+      "title": "ClassroomStudent",
+      "description": "Public leaderboard entry for classmates within the same classCode.",
+      "type": "object",
+      "properties": {
+        "studentId": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "Student Auth UID"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 80,
+          "description": "Student display name"
+        },
+        "photoURL": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Student avatar photo URL"
+        },
+        "classCode": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Assigned class code (e.g. GRADE4-1)"
+        },
+        "xp": {
+          "type": "number",
+          "description": "Total XP earned"
+        },
+        "streak": {
+          "type": "number",
+          "description": "Current practice streak"
+        },
+        "dailyExercisesDone": {
+          "type": "number",
+          "description": "Exercises completed today"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of last score sync"
+        }
+      },
+      "required": [
+        "studentId",
+        "displayName",
+        "classCode",
+        "xp",
+        "streak",
+        "dailyExercisesDone"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Private user records and progress sync."
+    },
+    "/classrooms/{classCode}/students/{studentId}": {
+      "schema": "ClassroomStudent",
+      "description": "Classroom student leaderboard entries visible to class members."
+    }
+  }
+}

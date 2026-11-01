@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --font-hebrew: 'Rubik', system-ui, sans-serif;
+  --font-english: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: 'Rubik', system-ui, sans-serif;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.font-english {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.font-hebrew {
+  font-family: 'Rubik', system-ui, sans-serif;
+}
+
+.font-code {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom animation for gentle card pop */
+@keyframes softBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.animate-soft-bounce {
+  animation: softBounce 2s ease-in-out infinite;
+}

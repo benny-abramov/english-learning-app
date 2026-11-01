@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'classCode', 'xp', 'streak', 'dailyExercisesDone', 'dailyGoal']) &&
+        data.uid == request.auth.uid &&
+        data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 80 &&
+        data.classCode is string && data.classCode.size() > 0 && data.classCode.size() <= 32 &&
+        data.xp is number && data.xp >= 0 &&
+        data.streak is number && data.streak >= 0 &&
+        data.dailyExercisesDone is number && data.dailyExercisesDone >= 0 &&
+        data.dailyGoal is number && data.dailyGoal >= 1;
+    }
+
+    function isValidClassroomStudent(data) {
+      return data.keys().hasAll(['studentId', 'displayName', 'classCode', 'xp', 'streak', 'dailyExercisesDone']) &&
+        data.studentId == request.auth.uid &&
+        data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 80 &&
+        data.classCode is string && data.classCode.size() > 0 && data.classCode.size() <= 32 &&
+        data.xp is number && data.xp >= 0 &&
+        data.streak is number && data.streak >= 0 &&
+        data.dailyExercisesDone is number && data.dailyExercisesDone >= 0;
+    }
+
+    // Users private collection
+    match /users/{userId} {
+      allow get: if isSignedIn() && request.auth.uid == userId && isValidId(userId);
+      allow list: if false;
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidUser(incoming());
+      allow update: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidUser(incoming()) &&
+        incoming().uid == existing().uid &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'email', 'classCode', 'xp', 'streak', 'dailyExercisesDone', 'dailyGoal', 'lastExerciseDate', 'createdAt', 'updatedAt']);
+      allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(userId);
+    }
+
+    // Classrooms public leaderboard scores
+    match /classrooms/{classCode}/students/{studentId} {
+      allow get: if isSignedIn() && isValidId(classCode) && isValidId(studentId);
+      allow list: if isSignedIn() && isValidId(classCode);
+      allow create: if isSignedIn() && request.auth.uid == studentId && isValidId(classCode) && isValidId(studentId) &&
+        isValidClassroomStudent(incoming()) && incoming().classCode == classCode;
+      allow update: if isSignedIn() && request.auth.uid == studentId && isValidId(classCode) && isValidId(studentId) &&
+        isValidClassroomStudent(incoming()) &&
+        incoming().studentId == existing().studentId &&
+        incoming().classCode == existing().classCode &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'xp', 'streak', 'dailyExercisesDone', 'updatedAt']);
+      allow delete: if isSignedIn() && request.auth.uid == studentId && isValidId(classCode) && isValidId(studentId);
+    }
+  }
+}
